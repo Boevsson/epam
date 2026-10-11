@@ -1,0 +1,89 @@
+[project]
+name = "filings-qa"
+version = "0.1.0"
+description = "Hybrid-search question answering over SEC 10-K filings (NovaBridge Capital prototype)"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.100",
+    "import-linter>=2.0",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+xfail_strict = true
+markers = [
+    "slow: needs ML models or large files",
+    "e2e: exercises the HTTP API end to end",
+    "eval: measures retrieval and answer quality on the real corpus",
+]
+
+[tool.coverage.run]
+source = ["filings_qa"]
+branch = true
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "C4", "N", "PT", "RUF"]
+
+[tool.mypy]
+strict = true
+warn_unreachable = true
+mypy_path = "src"
+explicit_package_bases = true
+files = ["src", "tests"]
+
+# Architecture rules: the dependency rule from docs/technical-analysis.md §3.1, checked in CI.
+[tool.importlinter]
+root_package = "filings_qa"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Layers inside each bounded context"
+type = "layers"
+containers = ["filings_qa.ingestion", "filings_qa.research"]
+layers = ["adapters", "application", "domain"]
+
+[[tool.importlinter.contracts]]
+name = "Bounded contexts are independent"
+type = "independence"
+modules = ["filings_qa.ingestion", "filings_qa.research"]
+
+[[tool.importlinter.contracts]]
+name = "Domain and shared kernel are framework-free"
+type = "forbidden"
+source_modules = ["filings_qa.ingestion.domain", "filings_qa.research.domain", "filings_qa.shared_kernel"]
+forbidden_modules = [
+    "filings_qa.infrastructure",
+    "filings_qa.entrypoints",
+    "fastapi",
+    "pydantic",
+    "numpy",
+    "faiss",
+    "bm25s",
+    "pymupdf",
+    "fitz",
+    "sentence_transformers",
+    "anthropic",
+]
+
+[[tool.importlinter.contracts]]
+name = "Entrypoints never touch adapters (only bootstrap wires them)"
+type = "forbidden"
+source_modules = ["filings_qa.entrypoints"]
+forbidden_modules = ["filings_qa.ingestion.adapters", "filings_qa.research.adapters"]

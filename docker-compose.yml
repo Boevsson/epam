@@ -1,0 +1,10 @@
+name: novabridge-filings-qa
+
+services:
+  # Quality gate in a clean container: lint, format, types, architecture rules, tests.
+  # Usage: docker compose run --rm --build tests   (or: make docker-check)
+  tests:
+    build:
+      context: ./backend
+      target: dev
+    profiles: ["test"]

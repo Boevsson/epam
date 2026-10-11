@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.import_linter_cache/
+.coverage
+htmlcov/
+
+# Secrets: copy .env.example to .env
+.env
+
+# Generated index snapshots
+data/index/
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/

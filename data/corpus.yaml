@@ -1,0 +1,52 @@
+# Filing manifest: metadata the ingestion pipeline trusts instead of guessing it from PDF text.
+# The PDFs come from FinanceBench (https://github.com/patronus-ai/financebench); file names match its doc_name.
+# fiscal_year is the company's own designation: 52/53-week fiscal years can end in early January.
+filings:
+  - file: AMD_2022_10K.pdf
+    company: Advanced Micro Devices, Inc.
+    ticker: AMD
+    form: 10-K
+    fiscal_year: 2022
+    aliases: ["AMD", "Advanced Micro Devices"]
+
+  - file: AMERICANEXPRESS_2022_10K.pdf
+    company: American Express Company
+    ticker: AXP
+    form: 10-K
+    fiscal_year: 2022
+    aliases: ["American Express", "AmEx", "AMEX"]
+
+  - file: BOEING_2022_10K.pdf
+    company: The Boeing Company
+    ticker: BA
+    form: 10-K
+    fiscal_year: 2022
+    aliases: ["Boeing"]
+
+  - file: PEPSICO_2021_10K.pdf
+    company: PepsiCo, Inc.
+    ticker: PEP
+    form: 10-K
+    fiscal_year: 2021
+    aliases: ["PepsiCo", "Pepsi"]
+
+  - file: PEPSICO_2022_10K.pdf
+    company: PepsiCo, Inc.
+    ticker: PEP
+    form: 10-K
+    fiscal_year: 2022
+    aliases: ["PepsiCo", "Pepsi"]
+
+  - file: JOHNSON_JOHNSON_2022_10K.pdf
+    company: Johnson & Johnson
+    ticker: JNJ
+    form: 10-K
+    fiscal_year: 2022
+    aliases: ["Johnson & Johnson", "J&J", "JnJ"]
+
+  - file: PFIZER_2021_10K.pdf
+    company: Pfizer Inc.
+    ticker: PFE
+    form: 10-K
+    fiscal_year: 2021
+    aliases: ["Pfizer"]
