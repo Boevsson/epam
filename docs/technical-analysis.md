@@ -488,6 +488,20 @@ Also detect **pages with no text layer** (scanned pages): log them and flag the 
 - **Item sets vary by filing year.** Item 1C (Cybersecurity) exists only for fiscal years ending on or after 2023-12-15. Item 6 was "Selected Financial Data" in older filings and is "[Reserved]" now. So detect Items **by code, not title**, and never assume every Item is present.
 - **Never block ingestion.** If detection fails, use `ItemCode.UNKNOWN`. Search still works and citations fall back to page only.
 
+**Validated on the 7-filing corpus (2026-10-11).** Every filing splits into the expected item sequence. Rules added
+because real PDFs broke the first version:
+
+- Running headers are lines at a page edge on **≥ 20%** of pages, not 50%: PepsiCo's PDF is 549 pages, ~420 of them
+  exhibits, which diluted its "Table of Contents" header below a 50% threshold.
+- A heading never continues a sentence. Pfizer has "…see the / Item 1A. Risk Factors—… section", a forward reference that
+  would otherwise steal Item 1A. Only long prose lines count, so a leftover "Table of Contents" line can't block a heading.
+- Combined headings ("ITEMS 10, 11, 12 and 13.", AmEx) start the section of their first item.
+- The 10-K ends at "SIGNATURES" after the last item. Appended exhibits are excluded: about 1,050 of 1,917 pages, mostly
+  PepsiCo's.
+- Known layout quirks (not bugs): PepsiCo's financial statements sit inside its Item 7 pages, and Pfizer has no Item 1B/4
+  headings.
+- FinanceBench `evidence_page_num` is **0-based**: 37 of 40 evidence snippets appear on page index *n* (the other 3 are tables).
+
 ### 5.5 Chunking (domain, with a `TokenCounter` port)
 
 - **Never cross an Item boundary.** Split into paragraphs, then sentences, and pack greedily up to **~350 tokens** with **~50 tokens (1–2 sentences) of overlap**.
