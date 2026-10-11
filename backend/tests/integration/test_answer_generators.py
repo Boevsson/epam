@@ -16,6 +16,7 @@ from filings_qa.research.adapters.claude_generator import (
 )
 from filings_qa.research.adapters.extractive_generator import ExtractiveAnswerGenerator
 from filings_qa.research.application.ports import AnswerGenerationUnavailableError
+from filings_qa.research.domain.analyst_vocabulary import AnalystVocabulary
 from filings_qa.research.domain.answer import Evidence, GroundingStatus
 from filings_qa.research.domain.grounding import GroundingPolicy
 from filings_qa.research.domain.question import Question
@@ -176,6 +177,18 @@ class TestExtractiveAnswerGenerator:
         assert draft.segments[0].text.endswith("”")
         assert draft.segments[0].citations
         assert draft.segments[1].text == "\n"
+
+    def test_uses_the_analyst_vocabulary_to_find_the_sentence_that_answers(self) -> None:
+        passage = make_passage(
+            "AMD-10K-2022#0020",
+            "We also employ application engineers to assist our customers in designing systems.",
+            "One customer accounted for 16% of our consolidated net revenue for the year ended December 31, 2022.",
+        )
+        generator = ExtractiveAnswerGenerator(vocabulary=AnalystVocabulary.default())
+
+        draft = generator.generate(Question("Did AMD report customer concentration in FY22?"), Evidence((passage,)))
+
+        assert draft.segments[0].citations[0].quote.startswith("One customer accounted for 16%")
 
     def test_quotes_at_most_three_passages(self) -> None:
         many = Evidence(tuple(make_passage(f"AMD-10K-2022#{n:04d}", f"Fact number {n}.") for n in range(6)))
