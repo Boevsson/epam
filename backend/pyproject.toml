@@ -76,6 +76,7 @@ mypy_path = "src"
 explicit_package_bases = true
 files = ["src", "tests"]
 untyped_calls_exclude = ["pymupdf"]  # PyMuPDF ships partial annotations
+plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = ["Stemmer", "bm25s", "bm25s.*"]
@@ -120,3 +121,4 @@ name = "Entrypoints never touch adapters (only bootstrap wires them)"
 type = "forbidden"
 source_modules = ["filings_qa.entrypoints"]
 forbidden_modules = ["filings_qa.ingestion.adapters", "filings_qa.research.adapters"]
+allow_indirect_imports = true  # going through bootstrap.py (the composition root) is the intended path
