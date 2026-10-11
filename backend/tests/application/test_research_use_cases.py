@@ -5,11 +5,13 @@ from filings_qa.research.application.fallback_generator import FallbackAnswerGen
 from filings_qa.research.application.hybrid_retriever import HybridRetriever
 from filings_qa.research.application.list_filings import ListFilings
 from filings_qa.research.application.ports import AnswerGenerationUnavailableError
+from filings_qa.research.application.query_expansion import QueryExpandingRetriever
 from filings_qa.research.application.search_passages import (
     SearchCommand,
     SearchPassages,
     UnknownSearchModeError,
 )
+from filings_qa.research.domain.analyst_vocabulary import AnalystVocabulary
 from filings_qa.research.domain.answer import Evidence, GroundingStatus
 from filings_qa.research.domain.fusion import ReciprocalRankFusion
 from filings_qa.research.domain.grounding import GroundingPolicy
@@ -136,3 +138,15 @@ def test_list_filings_returns_every_ingested_filing() -> None:
     filings = ListFilings(READER)()
 
     assert sorted(f.filing_id for f in filings) == ["AMD-10K-2022", "PFE-10K-2021"]
+
+
+class TestQueryExpandingRetriever:
+    def test_retrieves_with_the_expanded_query_and_keeps_the_inner_retrievers_identity(self) -> None:
+        inner = StubRetriever("hybrid", ["PEP-10K-2021#0001"])
+        retriever = QueryExpandingRetriever(inner, AnalystVocabulary({r"capex": "purchases of property"}))
+
+        hits = retriever.retrieve("PepsiCo capex?", SearchScope(), limit=3)
+
+        assert retriever.name == "hybrid"
+        assert inner.calls == [("PepsiCo capex? purchases of property", SearchScope(), 3)]
+        assert [h.passage_id for h in hits] == ["PEP-10K-2021#0001"]
