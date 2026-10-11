@@ -1,0 +1,21 @@
+{
+  "id": "msg_fixture_01",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {"input_tokens": 1830, "output_tokens": 164},
+  "content": [
+    {"type": "thinking", "thinking": "", "signature": "fixture-signature"},
+    {"type": "text", "text": "AMD depends on third parties to manufacture its products", "citations": [
+      {"type": "search_result_location", "source": "passage:AMD-10K-2022#0001", "title": "Advanced Micro Devices, Inc. · 10-K FY2022 · Item 1A Risk Factors · p. 17",
+       "cited_text": "We rely on TSMC to manufacture our wafers.", "search_result_index": 0, "start_block_index": 0, "end_block_index": 1}
+    ]},
+    {"type": "text", "text": ", and constrained supply could limit revenue", "citations": [
+      {"type": "search_result_location", "source": "passage:AMD-10K-2022#0001", "title": "Advanced Micro Devices, Inc. · 10-K FY2022 · Item 1A Risk Factors · p. 17",
+       "cited_text": "We rely on TSMC to manufacture our wafers.Supply constraints could limit our revenue.", "search_result_index": 0, "start_block_index": 0, "end_block_index": 2}
+    ]},
+    {"type": "text", "text": ". Pfizer's filing is not relevant here."}
+  ]
+}

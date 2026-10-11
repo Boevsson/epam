@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Hybrid-search question answering over SEC 10-K filings (NovaBridge Capital prototype)"
 requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=1.13.0",
     "bm25s>=0.3.13",
     "numpy>=2.5.4",
     "pydantic-settings>=2.15.0",
