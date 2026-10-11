@@ -87,6 +87,9 @@ class TestItemCode:
     def test_every_item_has_a_heading(self, item: ItemCode) -> None:
         assert item.heading
 
+    def test_front_matter_before_item_1_has_its_own_code(self) -> None:
+        assert ItemCode("COVER").heading == "Cover Page and Front Matter"
+
     def test_headings_use_the_official_titles(self) -> None:
         assert ItemCode.RISK_FACTORS.heading == "Risk Factors"
         assert ItemCode.MARKET_RISK.heading == "Quantitative and Qualitative Disclosures About Market Risk"
