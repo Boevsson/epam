@@ -75,7 +75,7 @@ def build_research_services(
             effort=settings.llm_effort,
             max_tokens=settings.llm_max_tokens,
         )
-    generator = FallbackAnswerGenerator(claude, ExtractiveAnswerGenerator())
+    generator = FallbackAnswerGenerator(claude, ExtractiveAnswerGenerator(vocabulary=vocabulary))
     embedder.embed_query("warm up")  # load the model now, not on the first request
     return ResearchServices(
         ask=AskQuestion(hybrid, reader, generator, GroundingPolicy(), evidence_size=settings.evidence_size),
