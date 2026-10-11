@@ -86,10 +86,9 @@ def test_index_text_prefixes_the_passage_with_company_form_year_and_item() -> No
 
 
 def test_front_matter_header_names_the_section_without_an_item_number() -> None:
-    assert PFIZER_FILING_HEADER_FOR_COVER == "Pfizer Inc. (PFE) · Form 10-K · FY2021 · Cover Page and Front Matter"
+    header = Filing.contextual_header_for(PFIZER, ItemCode.COVER)
 
-
-PFIZER_FILING_HEADER_FOR_COVER = Filing.contextual_header_for(PFIZER, ItemCode.COVER)
+    assert header == "Pfizer Inc. (PFE) · Form 10-K · FY2021 · Cover Page and Front Matter"
 
 
 def test_prepare_filing_cleans_sections_and_chunks_raw_page_text() -> None:
@@ -101,7 +100,9 @@ def test_prepare_filing_cleans_sections_and_chunks_raw_page_text() -> None:
         "EXHIBIT 21 SUBSIDIARIES",
     ]
 
-    filing = prepare_filing(PFIZER, SHA, pages, Chunker(WordCounter(), ChunkingPolicy(max_tokens=50)))
+    filing = prepare_filing(
+        PFIZER, SHA, pages, Chunker(WordCounter(), ChunkingPolicy(max_tokens=50, overlap_tokens=10))
+    )
 
     assert [p.item for p in filing.passages] == [
         ItemCode.COVER,

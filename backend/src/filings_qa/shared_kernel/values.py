@@ -79,6 +79,18 @@ class PageRange:
         return f"p. {self.start}" if self.start == self.end else f"pp. {self.start}-{self.end}"
 
 
+class FormType(StrEnum):
+    """SEC form types the system ingests."""
+
+    TEN_K = "10-K"
+    TEN_K_AMENDMENT = "10-K/A"
+
+    @property
+    def compact(self) -> str:
+        """The form without punctuation, for identifiers: ``10K``, ``10KA``."""
+        return self.value.replace("-", "").replace("/", "")
+
+
 class ItemCode(StrEnum):
     """The standard items (sections) of a Form 10-K.
 
@@ -170,3 +182,11 @@ _HEADINGS: Mapping[ItemCode, str] = MappingProxyType(
         ItemCode.UNKNOWN: "Unknown section",
     }
 )
+
+
+def make_filing_id(ticker: Ticker, form: FormType, fiscal_year: FiscalYear) -> FilingId:
+    return FilingId(f"{ticker}-{form.compact}-{fiscal_year.value}")
+
+
+def make_passage_id(filing_id: FilingId, ordinal: int) -> PassageId:
+    return PassageId(f"{filing_id}#{ordinal:04d}")
