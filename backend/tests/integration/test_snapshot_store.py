@@ -18,7 +18,9 @@ from tests.fakes.embeddings import HashingEmbedder
 def filing(ticker: str, year: int, *texts: str) -> Filing:
     metadata = FilingMetadata(f"{ticker} Inc.", Ticker(ticker), FormType.TEN_K, FiscalYear(year), (ticker,))
     chunks = [Chunk(ItemCode.RISK_FACTORS, PageRange.single(n + 1), (text,)) for n, text in enumerate(texts)]
-    return Filing.from_chunks(metadata, source_sha256="f" * 64, page_count=10, chunks=chunks)
+    return Filing.from_chunks(
+        metadata, source_sha256="f" * 64, page_count=10, chunks=chunks, source_name=f"{ticker}_{year}_10K.pdf"
+    )
 
 
 def ticking_clock() -> datetime:
@@ -61,6 +63,9 @@ def test_publish_writes_passages_keyword_index_vectors_and_manifest(tmp_path: Pa
         (1, "AMD-10K-2022#0001", "1A", 2),
         (2, "PFE-10K-2021#0000", "1A", 1),
     ]
+    with sqlite3.connect(snapshot / "passages.sqlite") as db:
+        sources = db.execute("SELECT filing_id, source_file FROM filings ORDER BY filing_id").fetchall()
+    assert sources == [("AMD-10K-2022", "AMD_2022_10K.pdf"), ("PFE-10K-2021", "PFE_2021_10K.pdf")]
     assert store.current_fingerprint() == "abc"
 
 

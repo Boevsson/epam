@@ -50,6 +50,7 @@ def test_ingests_every_filing_into_one_published_snapshot() -> None:
     assert report.filings[0].items == (ItemCode.COVER, ItemCode.BUSINESS, ItemCode.RISK_FACTORS)
     assert len(store.published) == 1
     assert [f.id for f in store.published[0][0]] == ["AMD-10K-2022", "PFE-10K-2021"]
+    assert [f.source_name for f in store.published[0][0]] == ["AMD_2022.pdf", "PFE_2021.pdf"]
 
 
 def test_an_unchanged_corpus_is_not_ingested_again() -> None:

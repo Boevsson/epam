@@ -34,7 +34,10 @@ def corpus_filings() -> list[Filing]:
     for (ticker, company, year), passages in CORPUS.items():
         metadata = FilingMetadata(company, Ticker(ticker), FormType.TEN_K, FiscalYear(year), (company.split()[0],))
         chunks = [Chunk(item, PageRange.single(page), (text,)) for item, page, text in passages]
-        filings.append(Filing.from_chunks(metadata, source_sha256="c" * 64, page_count=200, chunks=chunks))
+        filing = Filing.from_chunks(
+            metadata, source_sha256="c" * 64, page_count=200, chunks=chunks, source_name=f"{ticker}_{year}_10K.pdf"
+        )
+        filings.append(filing)
     return filings
 
 

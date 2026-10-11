@@ -34,6 +34,7 @@ def test_summarizes_the_indexed_filings(reader: SqliteSnapshotReader) -> None:
     assert sorted(summaries) == ["AMD-10K-2022", "PEP-10K-2022", "PFE-10K-2021"]
     assert summaries["PFE-10K-2021"].passage_count == 2
     assert summaries["PFE-10K-2021"].aliases == ("Pfizer",)
+    assert summaries["PFE-10K-2021"].source_name == "PFE_2021_10K.pdf"
 
 
 def test_refuses_a_snapshot_built_with_another_embedding_model(snapshot_dir: Path) -> None:
