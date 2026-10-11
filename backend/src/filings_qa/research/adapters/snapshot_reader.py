@@ -19,17 +19,17 @@ from filings_qa.infrastructure.snapshot import (
     SnapshotDirectory,
     SnapshotManifest,
 )
-from filings_qa.research.application.ports import FilingSummary
+from filings_qa.research.application.ports import FilingSummary, IndexUnavailableError
 from filings_qa.research.domain.passage import Passage
 from filings_qa.research.domain.scope import SearchScope
 from filings_qa.shared_kernel.values import FilingId, FiscalYear, ItemCode, PageRange, PassageId, Ticker
 
 
-class SnapshotUnavailableError(Exception):
+class SnapshotUnavailableError(IndexUnavailableError):
     """No snapshot has been published yet."""
 
 
-class SnapshotIncompatibleError(Exception):
+class SnapshotIncompatibleError(IndexUnavailableError):
     """The snapshot was built with a different embedding model or format than the service expects."""
 
 
@@ -39,7 +39,8 @@ class SqliteSnapshotReader:
         self.manifest = manifest
         with sqlite3.connect(f"file:{path / PASSAGES_FILE}?mode=ro", uri=True) as db:
             filings = db.execute(
-                "SELECT filing_id, company, ticker, fiscal_year, aliases, page_count, passage_count FROM filings"
+                "SELECT filing_id, company, ticker, fiscal_year, aliases, page_count, passage_count, source_file"
+                " FROM filings"
             ).fetchall()
             rows = db.execute(
                 "SELECT p.passage_id, p.filing_id, p.item, p.page_start, p.page_end, p.sentences"
@@ -47,9 +48,9 @@ class SqliteSnapshotReader:
             ).fetchall()
         self._filings = [
             FilingSummary(
-                FilingId(fid), company, Ticker(ticker), FiscalYear(year), tuple(json.loads(aliases)), pages, n
+                FilingId(fid), company, Ticker(ticker), FiscalYear(year), tuple(json.loads(aliases)), pages, n, source
             )
-            for fid, company, ticker, year, aliases, pages, n in filings
+            for fid, company, ticker, year, aliases, pages, n, source in filings
         ]
         by_filing = {f.filing_id: f for f in self._filings}
         self._passages: list[Passage] = []

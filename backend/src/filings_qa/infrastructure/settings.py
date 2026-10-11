@@ -6,6 +6,8 @@ from typing import Literal
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from filings_qa.infrastructure.snapshot import FORMAT_VERSION
+
 _REPOSITORY = Path(__file__).resolve().parents[4]  # backend/src/filings_qa/infrastructure -> repository
 PIPELINE_VERSION = 1  # bump when parsing, cleaning, sectioning or chunking rules change
 
@@ -50,6 +52,6 @@ class Settings(BaseSettings):
     def pipeline_signature(self) -> str:
         """Everything that changes the index; part of the corpus fingerprint, so changing it re-ingests."""
         return (
-            f"pipeline={PIPELINE_VERSION};embedding={self.embedding_model};"
+            f"pipeline={PIPELINE_VERSION};format={FORMAT_VERSION};embedding={self.embedding_model};"
             f"chunks={self.chunk_max_tokens}/{self.chunk_overlap_tokens}"
         )

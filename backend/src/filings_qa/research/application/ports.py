@@ -2,6 +2,7 @@
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Protocol
 
 from filings_qa.research.domain.answer import DraftAnswer, Evidence
@@ -31,6 +32,7 @@ class FilingSummary:
     aliases: tuple[str, ...]
     page_count: int
     passage_count: int
+    source_name: str | None = None
 
 
 class PassageReader(Protocol):
@@ -39,6 +41,16 @@ class PassageReader(Protocol):
         ...
 
     def filings(self) -> Sequence[FilingSummary]: ...
+
+
+class IndexUnavailableError(Exception):
+    """No usable index snapshot: none published yet, or built with an incompatible model or format."""
+
+
+class DocumentLocator(Protocol):
+    def path_for(self, filing_id: FilingId) -> Path | None:
+        """The original PDF of a filing, for verification, or None if unknown."""
+        ...
 
 
 class AnswerGenerationUnavailableError(Exception):

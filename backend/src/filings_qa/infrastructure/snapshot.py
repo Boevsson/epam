@@ -12,7 +12,7 @@ import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2  # 2: filings.source_file
 MANIFEST_FILE = "manifest.json"
 PASSAGES_FILE = "passages.sqlite"
 BM25_DIR = "bm25"
@@ -28,7 +28,8 @@ CREATE TABLE filings (
     form           TEXT NOT NULL,
     fiscal_year    INTEGER NOT NULL,
     aliases        TEXT NOT NULL,      -- JSON array
-    source         TEXT NOT NULL,
+    source         TEXT NOT NULL,      -- sha256 of the source PDF
+    source_file    TEXT,               -- its file name, to serve the original for verification
     page_count     INTEGER NOT NULL,
     excluded_start INTEGER,
     excluded_end   INTEGER,

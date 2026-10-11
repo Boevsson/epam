@@ -77,10 +77,10 @@ def _write_passages(path: Path, filings: Sequence[Filing]) -> list[str]:
         for filing in filings:
             meta, excluded = filing.metadata, filing.excluded_pages
             db.execute(
-                "INSERT INTO filings VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO filings VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     filing.id, meta.company, str(meta.ticker), str(meta.form), meta.fiscal_year.value,
-                    json.dumps(list(meta.aliases)), filing.source_sha256, filing.page_count,
+                    json.dumps(list(meta.aliases)), filing.source_sha256, filing.source_name, filing.page_count,
                     excluded.start if excluded else None, excluded.end if excluded else None,
                     len(filing.passages),
                 ),

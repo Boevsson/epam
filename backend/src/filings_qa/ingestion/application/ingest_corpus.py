@@ -5,6 +5,7 @@ import json
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import PurePath
 
 from filings_qa.ingestion.application.ports import CorpusCatalog, DocumentParser, FilingSource, SnapshotStore
 from filings_qa.ingestion.domain.chunking import Chunker
@@ -75,7 +76,13 @@ class IngestCorpus:
             return IngestReport(snapshot_version=None, skipped=True)
 
         filings = [
-            prepare_filing(source.metadata, source.sha256, self._parser.page_texts(source), self._chunker)
+            prepare_filing(
+                source.metadata,
+                source.sha256,
+                self._parser.page_texts(source),
+                self._chunker,
+                source_name=PurePath(source.location).name,
+            )
             for source in sources
         ]
         version = self._store.publish(filings, fingerprint)

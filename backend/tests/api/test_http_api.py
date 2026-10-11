@@ -5,11 +5,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from filings_qa.entrypoints.http.app import create_app
-from filings_qa.entrypoints.http.services import ResearchServices
 from filings_qa.research.adapters.snapshot_reader import SnapshotUnavailableError
 from filings_qa.research.application.ask_question import AskQuestion
 from filings_qa.research.application.list_filings import ListFilings
 from filings_qa.research.application.search_passages import SearchPassages
+from filings_qa.research.application.services import ResearchServices
 from filings_qa.research.domain.grounding import GroundingPolicy
 from filings_qa.shared_kernel.values import FilingId
 from tests.fakes.research import InMemoryPassageReader, SpyAnswerGenerator, StubRetriever, make_passage

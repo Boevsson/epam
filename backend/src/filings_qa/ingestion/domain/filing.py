@@ -68,6 +68,7 @@ class Filing:
     page_count: int
     passages: tuple[Passage, ...]
     excluded_pages: PageRange | None = None
+    source_name: str | None = None  # file name of the source PDF, for linking citations to the original
 
     def __post_init__(self) -> None:
         if not _SHA256.fullmatch(self.source_sha256):
@@ -89,12 +90,13 @@ class Filing:
         page_count: int,
         chunks: Sequence[Chunk],
         excluded_pages: PageRange | None = None,
+        source_name: str | None = None,
     ) -> "Filing":
         passages = tuple(
             Passage(make_passage_id(metadata.id, ordinal), ordinal, chunk.item, chunk.pages, chunk.sentences)
             for ordinal, chunk in enumerate(chunks)
         )
-        return cls(metadata, source_sha256, page_count, passages, excluded_pages)
+        return cls(metadata, source_sha256, page_count, passages, excluded_pages, source_name)
 
     @property
     def id(self) -> FilingId:
@@ -117,7 +119,14 @@ class Filing:
         return f"{self.contextual_header_for(self.metadata, passage.item)}\n{passage.text}"
 
 
-def prepare_filing(metadata: FilingMetadata, source_sha256: str, page_texts: Sequence[str], chunker: Chunker) -> Filing:
+def prepare_filing(
+    metadata: FilingMetadata,
+    source_sha256: str,
+    page_texts: Sequence[str],
+    chunker: Chunker,
+    *,
+    source_name: str | None = None,
+) -> Filing:
     """The pure ingestion pipeline: raw page text -> clean lines -> 10-K sections -> passages -> Filing."""
     document = sectionize(clean_pages(page_texts))
     chunks = [chunk for section in document.sections for chunk in chunker.chunk(section)]
@@ -127,4 +136,5 @@ def prepare_filing(metadata: FilingMetadata, source_sha256: str, page_texts: Seq
         page_count=len(page_texts),
         chunks=chunks,
         excluded_pages=document.excluded_pages,
+        source_name=source_name,
     )
