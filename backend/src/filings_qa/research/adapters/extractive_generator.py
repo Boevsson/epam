@@ -16,12 +16,23 @@ class ExtractiveAnswerGenerator:
 
     def generate(self, question: Question, evidence: Evidence) -> DraftAnswer:
         terms = set(tokenize(question.text))
-        segments = []
+        segments: list[AnswerSegment] = []
         for passage in evidence.passages[: self._max_passages]:
+            sentences = passage.sentences
             best = max(
-                range(len(passage.sentences)),
-                key=lambda i: (len(terms & set(tokenize(passage.sentences[i]))), -i),
+                range(len(sentences)), key=lambda i: (_is_prose(sentences[i]), _overlap(terms, sentences[i]), -i)
             )
-            sentence = passage.sentences[best]
-            segments.append(AnswerSegment(f"“{sentence}”\n", (Citation(passage.id, sentence),)))
+            sentence = sentences[best]
+            segments += [AnswerSegment(f"“{sentence}”", (Citation(passage.id, sentence),)), AnswerSegment("\n")]
         return DraftAnswer(tuple(segments), generator=EXTRACTIVE_GENERATOR)
+
+
+def _overlap(terms: set[str], sentence: str) -> int:
+    return len(terms & set(tokenize(sentence)))
+
+
+def _is_prose(sentence: str) -> bool:
+    """Flattened table rows are mostly numbers; analysts want a sentence they can read."""
+    words = sentence.split()
+    numeric = sum(1 for word in words if any(ch.isdigit() for ch in word))
+    return bool(words) and numeric / len(words) < 0.25

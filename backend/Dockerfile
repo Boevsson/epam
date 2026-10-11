@@ -22,3 +22,25 @@ COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 CMD ["sh", "scripts/check.sh"]
+
+# ---- runtime: production dependencies only, embedding model baked in, non-root -----------------
+FROM base AS runtime
+ENV HF_HOME=/opt/hf-cache \
+    DATA_DIR=/data
+COPY pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-install-project
+COPY src ./src
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-editable
+# Download the embedding model at build time so containers start fast and need no internet access.
+ARG EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('${EMBEDDING_MODEL}')"
+RUN useradd --create-home --uid 10001 app \
+    && mkdir -p /data/index \
+    && chown -R app /opt/hf-cache /data
+USER app
+EXPOSE 8000
+HEALTHCHECK --interval=10s --timeout=5s --start-period=90s --retries=6 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+CMD ["uvicorn", "filings_qa.entrypoints.http.main:app", "--host", "0.0.0.0", "--port", "8000"]

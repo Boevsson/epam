@@ -1,6 +1,41 @@
 name: novabridge-filings-qa
 
+x-backend: &backend
+  image: novabridge-filings-qa-backend
+  build:
+    context: ./backend
+    target: runtime
+  env_file:
+    - path: .env
+      required: false
+  volumes:
+    - ./data/filings:/data/filings:ro
+    - ./data/corpus.yaml:/data/corpus.yaml:ro
+    - index:/data/index
+
 services:
+  # One-off: parses the PDFs and publishes the index snapshot (skips work when the corpus is unchanged).
+  ingest:
+    <<: *backend
+    command: ["filings-qa", "ingest"]
+    restart: "no"
+
+  api:
+    <<: *backend
+    depends_on:
+      ingest:
+        condition: service_completed_successfully
+    ports:
+      - "${API_PORT:-8000}:8000"
+
+  web:
+    build: ./frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
   # Quality gate in a clean container: lint, format, types, architecture rules, tests.
   # Usage: docker compose run --rm --build tests   (or: make docker-check)
   tests:
@@ -8,3 +43,6 @@ services:
       context: ./backend
       target: dev
     profiles: ["test"]
+
+volumes:
+  index:
