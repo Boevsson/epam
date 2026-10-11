@@ -20,7 +20,9 @@ def section(*lines: tuple[int, str], item: ItemCode = ItemCode.RISK_FACTORS) -> 
 
 
 def sentence(words: int, tag: str) -> str:
-    return " ".join([tag] * (words - 1) + [f"{tag}."])
+    """A sentence of `words` words, capitalized like a real one so the splitter sees a boundary."""
+    word = tag.upper()
+    return " ".join([word] * (words - 1) + [f"{word}."])
 
 
 def chunker(max_tokens: int, overlap_tokens: int = 0) -> Chunker:
@@ -28,7 +30,9 @@ def chunker(max_tokens: int, overlap_tokens: int = 0) -> Chunker:
 
 
 def test_a_short_section_becomes_one_chunk_with_its_item_and_pages() -> None:
-    chunks = chunker(50).chunk(section((3, "Item 1A. Risk Factors"), (3, "Supply may be"), (4, "constrained.")))
+    chunks = chunker(50).chunk(
+        section((3, "Item 1A. Risk Factors"), (3, "Supply may be"), (4, "constrained."))
+    )
 
     assert len(chunks) == 1
     assert chunks[0].item is ItemCode.RISK_FACTORS
