@@ -86,6 +86,7 @@ class ItemCode(StrEnum):
     (1C, 9C) are missing from older filings.
     """
 
+    COVER = "COVER"  # front matter before Item 1: cover page, table of contents
     BUSINESS = "1"
     RISK_FACTORS = "1A"
     UNRESOLVED_STAFF_COMMENTS = "1B"
@@ -129,6 +130,7 @@ class ItemCode(StrEnum):
 
 _HEADINGS: Mapping[ItemCode, str] = MappingProxyType(
     {
+        ItemCode.COVER: "Cover Page and Front Matter",
         ItemCode.BUSINESS: "Business",
         ItemCode.RISK_FACTORS: "Risk Factors",
         ItemCode.UNRESOLVED_STAFF_COMMENTS: "Unresolved Staff Comments",
