@@ -153,6 +153,30 @@ class TestExtractiveAnswerGenerator:
         ]
         assert GroundingPolicy().assess(draft, EVIDENCE).status is GroundingStatus.EXTRACTIVE_FALLBACK
 
+    def test_prefers_a_prose_sentence_over_a_flattened_table_row(self) -> None:
+        passage = make_passage(
+            "BA-10K-2022#0010",
+            "Revenue customers U.S. 3,042 1,681 513 Total customers 13,567 9,905 8,711 customers 25,750 19,391",
+            "Our primary customers are commercial airlines and the U.S. government.",
+            ticker="BA",
+        )
+
+        draft = ExtractiveAnswerGenerator().generate(
+            Question("Who are Boeing's primary customers?"), Evidence((passage,))
+        )
+
+        assert (
+            draft.segments[0].citations[0].quote
+            == "Our primary customers are commercial airlines and the U.S. government."
+        )
+
+    def test_each_quote_is_followed_by_its_citation_before_the_line_break(self) -> None:
+        draft = ExtractiveAnswerGenerator().generate(Question("What could limit AMD's revenue?"), EVIDENCE)
+
+        assert draft.segments[0].text.endswith("”")
+        assert draft.segments[0].citations
+        assert draft.segments[1].text == "\n"
+
     def test_quotes_at_most_three_passages(self) -> None:
         many = Evidence(tuple(make_passage(f"AMD-10K-2022#{n:04d}", f"Fact number {n}.") for n in range(6)))
 
