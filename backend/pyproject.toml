@@ -3,7 +3,17 @@ name = "filings-qa"
 version = "0.1.0"
 description = "Hybrid-search question answering over SEC 10-K filings (NovaBridge Capital prototype)"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "bm25s>=0.3.13",
+    "numpy>=2.5.4",
+    "pydantic-settings>=2.15.0",
+    "pymupdf>=1.28.2",
+    "pystemmer>=3.1.0",
+    "pyyaml>=6.0.3",
+    "sentence-transformers>=6.1.0",
+    "torch>=2.14.1",
+    "typer>=0.27.3",
+]
 
 [dependency-groups]
 dev = [
@@ -13,7 +23,20 @@ dev = [
     "pytest>=8.3",
     "pytest-cov>=5.0",
     "ruff>=0.6",
+    "types-pyyaml>=6.0.12.20260906",
 ]
+
+[project.scripts]
+filings-qa = "filings_qa.entrypoints.cli.main:app"
+
+# CPU-only PyTorch on Linux (Docker): the default CUDA build pulls several GB of NVIDIA libraries.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [build-system]
 requires = ["uv_build>=0.13.0,<0.14.0"]
@@ -47,6 +70,10 @@ warn_unreachable = true
 mypy_path = "src"
 explicit_package_bases = true
 files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["Stemmer", "bm25s", "bm25s.*"]
+ignore_missing_imports = true
 
 # Architecture rules: the dependency rule from docs/technical-analysis.md §3.1, checked in CI.
 [tool.importlinter]
