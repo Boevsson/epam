@@ -25,7 +25,5 @@ class Passage:
     @property
     def label(self) -> str:
         """A source reference an analyst can check: ``Pfizer Inc. · 10-K FY2021 · Item 1A ... · p. 19``."""
-        section = (
-            self.item.heading if self.item in _NOT_NUMBERED else f"Item {self.item.value} {self.item.heading}"
-        )
+        section = self.item.heading if self.item in _NOT_NUMBERED else f"Item {self.item.value} {self.item.heading}"
         return f"{self.company} · 10-K {self.fiscal_year} · {section} · {self.pages}"

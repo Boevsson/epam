@@ -33,9 +33,7 @@ def years(*values: int) -> frozenset[FiscalYear]:
         ("Compare Pfizer's and J&J's gross margin.", tickers("PFE", "JNJ")),
     ],
 )
-def test_detects_companies_by_name_alias_ticker_and_possessive(
-    question: str, expected: frozenset[Ticker]
-) -> None:
+def test_detects_companies_by_name_alias_ticker_and_possessive(question: str, expected: frozenset[Ticker]) -> None:
     resolved = resolver.resolve(question, SearchScope())
 
     assert resolved.scope.tickers == expected

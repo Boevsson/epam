@@ -5,9 +5,7 @@ from filings_qa.shared_kernel.values import ItemCode, PageRange
 
 def pages(*page_texts: str) -> list[Line]:
     """Lines of a document whose pages are given as newline-separated text."""
-    return [
-        Line(number, text) for number, page in enumerate(page_texts, start=1) for text in page.splitlines()
-    ]
+    return [Line(number, text) for number, page in enumerate(page_texts, start=1) for text in page.splitlines()]
 
 
 def items_of(sections: tuple[Section, ...]) -> list[ItemCode]:
@@ -58,9 +56,7 @@ def test_accepts_a_title_on_the_line_after_the_item_number() -> None:
 
 
 def test_text_before_item_1_becomes_the_cover_section() -> None:
-    result = sectionize(
-        pages("ANNUAL REPORT ON FORM 10-K\nCommission file number 1-442", "Item 1. Business\ntext")
-    )
+    result = sectionize(pages("ANNUAL REPORT ON FORM 10-K\nCommission file number 1-442", "Item 1. Business\ntext"))
 
     assert items_of(result.sections) == [ItemCode.COVER, ItemCode.BUSINESS]
     assert result.sections[0].pages == PageRange.single(1)
@@ -165,9 +161,7 @@ def test_a_combined_heading_starts_the_section_of_its_first_item() -> None:
 
 
 def test_ignores_sub_references_such_as_item_15_a_3() -> None:
-    result = sectionize(
-        pages("Item 15. Exhibits and Financial Statement Schedules\nlist", "ITEM 15(a)(3)\nmore")
-    )
+    result = sectionize(pages("Item 15. Exhibits and Financial Statement Schedules\nlist", "ITEM 15(a)(3)\nmore"))
 
     assert items_of(result.sections) == [ItemCode.EXHIBITS]
 

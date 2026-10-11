@@ -7,13 +7,12 @@ from filings_qa.research.adapters.snapshot_reader import (
     SnapshotUnavailableError,
     SqliteSnapshotReader,
 )
+from filings_qa.research.application.ports import FilingSummary
 from filings_qa.shared_kernel.values import FiscalYear, ItemCode, PageRange, PassageId, Ticker
 
 
 def test_reads_passages_in_the_requested_order_and_skips_unknown_ids(reader: SqliteSnapshotReader) -> None:
-    passages = reader.get_many(
-        [PassageId("PFE-10K-2021#0001"), PassageId("nope"), PassageId("AMD-10K-2022#0000")]
-    )
+    passages = reader.get_many([PassageId("PFE-10K-2021#0001"), PassageId("nope"), PassageId("AMD-10K-2022#0000")])
 
     assert [p.id for p in passages] == ["PFE-10K-2021#0001", "AMD-10K-2022#0000"]
     first = passages[1]
@@ -30,7 +29,7 @@ def test_reads_passages_in_the_requested_order_and_skips_unknown_ids(reader: Sql
 
 
 def test_summarizes_the_indexed_filings(reader: SqliteSnapshotReader) -> None:
-    summaries = {f.filing_id: f for f in reader.filings()}
+    summaries: dict[str, FilingSummary] = {f.filing_id: f for f in reader.filings()}
 
     assert sorted(summaries) == ["AMD-10K-2022", "PEP-10K-2022", "PFE-10K-2021"]
     assert summaries["PFE-10K-2021"].passage_count == 2

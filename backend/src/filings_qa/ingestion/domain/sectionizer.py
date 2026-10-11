@@ -116,9 +116,7 @@ def _continues_previous_line(lines: Sequence[Line], index: int) -> bool:
 
 def _outside_table_of_contents(candidates: list[_Heading]) -> list[_Heading]:
     entries_per_page = Counter(c.page for c in candidates if c.looks_like_contents_entry)
-    contents_pages = {
-        page for page, entries in entries_per_page.items() if entries >= MIN_TABLE_OF_CONTENTS_ENTRIES
-    }
+    contents_pages = {page for page, entries in entries_per_page.items() if entries >= MIN_TABLE_OF_CONTENTS_ENTRIES}
     return [c for c in candidates if c.page not in contents_pages]
 
 

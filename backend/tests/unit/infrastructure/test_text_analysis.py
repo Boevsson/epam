@@ -27,9 +27,7 @@ def test_drops_stopwords() -> None:
     assert tokenize("the risk of the company") == tokenize("risk company")
 
 
-@pytest.mark.parametrize(
-    ("inflected", "base"), [("risks", "risk"), ("pricing", "price"), ("Company's", "company")]
-)
+@pytest.mark.parametrize(("inflected", "base"), [("risks", "risk"), ("pricing", "price"), ("Company's", "company")])
 def test_inflections_and_possessives_reduce_to_the_same_token(inflected: str, base: str) -> None:
     assert tokenize(inflected) == tokenize(base)
 

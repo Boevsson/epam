@@ -117,9 +117,7 @@ class Filing:
         return f"{self.contextual_header_for(self.metadata, passage.item)}\n{passage.text}"
 
 
-def prepare_filing(
-    metadata: FilingMetadata, source_sha256: str, page_texts: Sequence[str], chunker: Chunker
-) -> Filing:
+def prepare_filing(metadata: FilingMetadata, source_sha256: str, page_texts: Sequence[str], chunker: Chunker) -> Filing:
     """The pure ingestion pipeline: raw page text -> clean lines -> 10-K sections -> passages -> Filing."""
     document = sectionize(clean_pages(page_texts))
     chunks = [chunk for section in document.sections for chunk in chunker.chunk(section)]

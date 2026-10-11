@@ -155,9 +155,7 @@ _HEADINGS: Mapping[ItemCode, str] = MappingProxyType(
             "and Issuer Purchases of Equity Securities"
         ),
         ItemCode.SELECTED_FINANCIAL_DATA: "[Reserved] (formerly Selected Financial Data)",
-        ItemCode.MD_AND_A: (
-            "Management's Discussion and Analysis of Financial Condition and Results of Operations"
-        ),
+        ItemCode.MD_AND_A: ("Management's Discussion and Analysis of Financial Condition and Results of Operations"),
         ItemCode.MARKET_RISK: "Quantitative and Qualitative Disclosures About Market Risk",
         ItemCode.FINANCIAL_STATEMENTS: "Financial Statements and Supplementary Data",
         ItemCode.CHANGES_IN_ACCOUNTANTS: (

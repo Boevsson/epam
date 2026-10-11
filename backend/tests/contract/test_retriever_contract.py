@@ -50,18 +50,14 @@ def test_finds_the_passage_that_uses_a_distinctive_term(retriever: Retriever) ->
     assert hits[0].passage_id == "AMD-10K-2022#0000"
 
 
-def test_only_returns_passages_of_the_companies_in_scope(
-    retriever: Retriever, reader: SqliteSnapshotReader
-) -> None:
+def test_only_returns_passages_of_the_companies_in_scope(retriever: Retriever, reader: SqliteSnapshotReader) -> None:
     hits = retriever.retrieve("revenue", SearchScope(tickers=frozenset({Ticker("PFE")})), limit=10)
 
     assert hits
     assert {p.ticker for p in reader.get_many([h.passage_id for h in hits])} == {Ticker("PFE")}
 
 
-def test_respects_fiscal_year_and_item_restrictions(
-    retriever: Retriever, reader: SqliteSnapshotReader
-) -> None:
+def test_respects_fiscal_year_and_item_restrictions(retriever: Retriever, reader: SqliteSnapshotReader) -> None:
     scope = SearchScope(fiscal_years=frozenset({FiscalYear(2022)}), items=frozenset({ItemCode.RISK_FACTORS}))
 
     hits = retriever.retrieve("supply chain revenue", scope, limit=10)

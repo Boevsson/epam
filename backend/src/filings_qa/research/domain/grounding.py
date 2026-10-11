@@ -24,8 +24,7 @@ class GroundingPolicy:
 
     def assess(self, draft: DraftAnswer, evidence: Evidence) -> Answer:
         segments = tuple(
-            AnswerSegment(s.text, tuple(c for c in s.citations if _supported(c, evidence)))
-            for s in draft.segments
+            AnswerSegment(s.text, tuple(c for c in s.citations if _supported(c, evidence))) for s in draft.segments
         )
         coverage = _coverage(segments)
         if draft.generator == EXTRACTIVE_GENERATOR:

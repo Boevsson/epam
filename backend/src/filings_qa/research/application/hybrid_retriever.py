@@ -11,9 +11,7 @@ from filings_qa.research.domain.scope import SearchScope
 class HybridRetriever:
     name = "hybrid"
 
-    def __init__(
-        self, retrievers: Sequence[Retriever], fusion: FusionStrategy, *, candidates: int = 50
-    ) -> None:
+    def __init__(self, retrievers: Sequence[Retriever], fusion: FusionStrategy, *, candidates: int = 50) -> None:
         self._retrievers = list(retrievers)
         self._fusion = fusion
         self._candidates = candidates

@@ -16,9 +16,7 @@ def build_embedder(settings: Settings) -> SentenceTransformerEmbedder:
     return SentenceTransformerEmbedder(settings.embedding_model, query_prompt=settings.embedding_query_prompt)
 
 
-def build_ingest_corpus(
-    settings: Settings, embedder: SentenceTransformerEmbedder | None = None
-) -> IngestCorpus:
+def build_ingest_corpus(settings: Settings, embedder: SentenceTransformerEmbedder | None = None) -> IngestCorpus:
     embedder = embedder or build_embedder(settings)
     if settings.chunk_max_tokens + HEADER_TOKEN_ALLOWANCE > embedder.max_tokens:
         raise ValueError(

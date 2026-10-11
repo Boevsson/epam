@@ -73,9 +73,7 @@ class Answer:
         for segment in self.segments:
             for citation in segment.citations:
                 if self.evidence.get(citation.passage_id) is None:
-                    raise InvalidValueError(
-                        f"citation to {citation.passage_id}, which is not in the evidence"
-                    )
+                    raise InvalidValueError(f"citation to {citation.passage_id}, which is not in the evidence")
 
     @property
     def text(self) -> str:

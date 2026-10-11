@@ -30,9 +30,7 @@ def ingest(
     for filing in report.filings:
         excluded = str(filing.excluded_pages) if filing.excluded_pages else "-"
         items = " ".join(item.value for item in filing.items)
-        typer.echo(
-            f"{filing.filing_id:<16} {filing.page_count:>5} {excluded:>10} {filing.passage_count:>8}  {items}"
-        )
+        typer.echo(f"{filing.filing_id:<16} {filing.page_count:>5} {excluded:>10} {filing.passage_count:>8}  {items}")
     total = sum(f.passage_count for f in report.filings)
     elapsed = time.perf_counter() - started
     typer.echo(f"Published snapshot {report.snapshot_version}: {total} passages in {elapsed:.1f}s.")

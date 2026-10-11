@@ -60,9 +60,7 @@ class TestAskQuestion:
     def test_does_not_call_the_llm_when_nothing_relevant_is_found(self) -> None:
         generator = SpyAnswerGenerator()
 
-        result = ask_question(StubRetriever("hybrid", []), generator)(
-            AskQuestionCommand("What is AMD's dividend?")
-        )
+        result = ask_question(StubRetriever("hybrid", []), generator)(AskQuestionCommand("What is AMD's dividend?"))
 
         assert result.status is GroundingStatus.INSUFFICIENT_EVIDENCE
         assert result.evidence == ()
@@ -71,9 +69,7 @@ class TestAskQuestion:
     def test_retrieves_within_the_companies_and_years_named_in_the_question(self) -> None:
         retriever = StubRetriever("hybrid", ["PFE-10K-2021#0001"])
 
-        result = ask_question(retriever, SpyAnswerGenerator())(
-            AskQuestionCommand("How is Pfizer's pricing in FY2021?")
-        )
+        result = ask_question(retriever, SpyAnswerGenerator())(AskQuestionCommand("How is Pfizer's pricing in FY2021?"))
 
         [(_, scope, _)] = retriever.calls
         assert scope.tickers == frozenset({Ticker("PFE")})
@@ -83,9 +79,7 @@ class TestAskQuestion:
         retriever = StubRetriever("hybrid", ["AMD-10K-2022#0001"])
         explicit = SearchScope(items=frozenset({ItemCode.RISK_FACTORS}))
 
-        ask_question(retriever, SpyAnswerGenerator())(
-            AskQuestionCommand("What about Pfizer?", scope=explicit)
-        )
+        ask_question(retriever, SpyAnswerGenerator())(AskQuestionCommand("What about Pfizer?", scope=explicit))
 
         assert retriever.calls[0][1] == explicit
 
@@ -131,9 +125,7 @@ class TestSearchPassages:
 
         result = search(SearchCommand("PC demand", mode="keyword", limit=5))
 
-        assert [(h.passage.id, h.hit.provenance["bm25"].rank) for h in result.hits] == [
-            ("AMD-10K-2022#0002", 1)
-        ]
+        assert [(h.passage.id, h.hit.provenance["bm25"].rank) for h in result.hits] == [("AMD-10K-2022#0002", 1)]
 
     def test_rejects_an_unknown_mode(self) -> None:
         with pytest.raises(UnknownSearchModeError, match="fuzzy"):

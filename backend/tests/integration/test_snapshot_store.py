@@ -37,9 +37,7 @@ def test_nothing_is_published_initially(store: FileSnapshotStore) -> None:
     assert store.current_fingerprint() is None
 
 
-def test_publish_writes_passages_keyword_index_vectors_and_manifest(
-    tmp_path: Path, store: FileSnapshotStore
-) -> None:
+def test_publish_writes_passages_keyword_index_vectors_and_manifest(tmp_path: Path, store: FileSnapshotStore) -> None:
     filings = [
         filing("AMD", 2022, "Supply may be constrained.", "Chips are cyclical."),
         filing("PFE", 2021, "Pricing."),
@@ -57,9 +55,7 @@ def test_publish_writes_passages_keyword_index_vectors_and_manifest(
     assert np.load(snapshot / "vectors.npy").shape == (3, HashingEmbedder.dimension)
     assert (snapshot / "bm25").is_dir()
     with sqlite3.connect(snapshot / "passages.sqlite") as db:
-        rows = db.execute(
-            "SELECT row_id, passage_id, item, page_start FROM passages ORDER BY row_id"
-        ).fetchall()
+        rows = db.execute("SELECT row_id, passage_id, item, page_start FROM passages ORDER BY row_id").fetchall()
     assert rows == [
         (0, "AMD-10K-2022#0000", "1A", 1),
         (1, "AMD-10K-2022#0001", "1A", 2),
@@ -88,9 +84,7 @@ class ExplodingEmbedder(HashingEmbedder):
 
 def test_a_failed_publish_leaves_the_live_snapshot_untouched(tmp_path: Path) -> None:
     directory = SnapshotDirectory(tmp_path / "index")
-    FileSnapshotStore(directory, HashingEmbedder(), clock=ticking_clock).publish(
-        [filing("AMD", 2022, "x")], "good"
-    )
+    FileSnapshotStore(directory, HashingEmbedder(), clock=ticking_clock).publish([filing("AMD", 2022, "x")], "good")
 
     broken = FileSnapshotStore(directory, ExplodingEmbedder(), clock=ticking_clock)
     with pytest.raises(RuntimeError, match="model crashed"):

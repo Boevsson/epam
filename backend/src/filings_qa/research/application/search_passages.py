@@ -35,9 +35,7 @@ class SearchPassages:
     def __call__(self, command: SearchCommand) -> SearchResult:
         retriever = self._retrievers.get(command.mode)
         if retriever is None:
-            raise UnknownSearchModeError(
-                f"unknown search mode {command.mode!r}; use one of {', '.join(self.modes)}"
-            )
+            raise UnknownSearchModeError(f"unknown search mode {command.mode!r}; use one of {', '.join(self.modes)}")
         query = Question(command.query)
         resolved = resolve_scope(self._passages, query.text, command.scope)
         hits = retriever.retrieve(query.text, resolved.scope, command.limit)

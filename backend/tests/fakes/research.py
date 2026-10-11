@@ -54,9 +54,7 @@ def _summaries(passages: Sequence[Passage]) -> list[FilingSummary]:
     for passage in passages:
         by_filing.setdefault(passage.filing_id, []).append(passage)
     return [
-        FilingSummary(
-            fid, ps[0].company, ps[0].ticker, ps[0].fiscal_year, _aliases(ps[0].company), 100, len(ps)
-        )
+        FilingSummary(fid, ps[0].company, ps[0].ticker, ps[0].fiscal_year, _aliases(ps[0].company), 100, len(ps))
         for fid, ps in by_filing.items()
     ]
 
@@ -69,9 +67,7 @@ def _aliases(company: str) -> tuple[str, ...]:
 class StubRetriever:
     """Returns fixed hits (filtered by scope when a reader is given) and records every call."""
 
-    def __init__(
-        self, name: str, hits: Sequence[str] = (), reader: InMemoryPassageReader | None = None
-    ) -> None:
+    def __init__(self, name: str, hits: Sequence[str] = (), reader: InMemoryPassageReader | None = None) -> None:
         self.name = name
         self._ids = [PassageId(h) for h in hits]
         self._reader = reader
@@ -83,9 +79,7 @@ class StubRetriever:
         if self._reader is not None:
             ids = [p.id for p in self._reader.get_many(ids) if scope.admits(p.ticker, p.fiscal_year, p.item)]
         return [
-            RetrievalHit(
-                pid, float(len(ids) - rank), {self.name: SourceRank(rank + 1, float(len(ids) - rank))}
-            )
+            RetrievalHit(pid, float(len(ids) - rank), {self.name: SourceRank(rank + 1, float(len(ids) - rank))})
             for rank, pid in enumerate(ids[:limit])
         ]
 
@@ -122,9 +116,7 @@ class SpyAnswerGenerator:
         if self._error is not None:
             raise self._error
         top = evidence.passages[0]
-        segment = AnswerSegment(
-            f"Answer based on {top.company} filing text.", (Citation(top.id, top.sentences[0]),)
-        )
+        segment = AnswerSegment(f"Answer based on {top.company} filing text.", (Citation(top.id, top.sentences[0]),))
         return DraftAnswer((segment,), generator=self._name, model="spy-model")
 
 

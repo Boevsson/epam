@@ -14,9 +14,7 @@ from dataclasses import dataclass
 from filings_qa.research.domain.scope import ResolvedScope, ScopeSource, SearchScope
 from filings_qa.shared_kernel.values import FiscalYear, Ticker
 
-_YEAR = re.compile(
-    r"\b(?:FY\s?'?(\d{2}(?:\d{2})?)|(?:fiscal\s+(?:year\s+)?)?((?:19|20)\d{2}))\b", re.IGNORECASE
-)
+_YEAR = re.compile(r"\b(?:FY\s?'?(\d{2}(?:\d{2})?)|(?:fiscal\s+(?:year\s+)?)?((?:19|20)\d{2}))\b", re.IGNORECASE)
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,9 +46,7 @@ def _company_pattern(company: CompanyProfile) -> re.Pattern[str]:
     names = {company.name, *company.aliases}
     alternatives = "|".join(re.escape(name) for name in sorted(names, key=len, reverse=True))
     by_name = rf"(?<![\w&])(?i:{alternatives})(?![\w&])"
-    by_ticker = (
-        rf"(?<![\w&]){re.escape(str(company.ticker))}(?![\w&])"  # tickers are matched case-sensitively
-    )
+    by_ticker = rf"(?<![\w&]){re.escape(str(company.ticker))}(?![\w&])"  # tickers are matched case-sensitively
     return re.compile(f"{by_name}|{by_ticker}")
 
 

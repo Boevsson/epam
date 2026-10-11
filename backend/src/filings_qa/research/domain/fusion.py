@@ -45,9 +45,7 @@ class ReciprocalRankFusion:
                 scores[hit.passage_id] = scores.get(hit.passage_id, 0.0) + weight / (self._k + rank)
                 provenance.setdefault(hit.passage_id, {})[source] = SourceRank(rank, hit.score)
         best_first = sorted(scores, key=lambda pid: (-scores[pid], pid))  # ties broken by id
-        return [
-            RetrievalHit(pid, scores[pid], MappingProxyType(provenance[pid])) for pid in best_first[:limit]
-        ]
+        return [RetrievalHit(pid, scores[pid], MappingProxyType(provenance[pid])) for pid in best_first[:limit]]
 
 
 def _first_occurrences(hits: Iterable[RetrievalHit]) -> Iterator[RetrievalHit]:
@@ -86,6 +84,4 @@ class WeightedScoreFusion:
                 scores[hit.passage_id] = scores.get(hit.passage_id, 0.0) + weight * normalized
                 provenance.setdefault(hit.passage_id, {})[source] = SourceRank(rank, hit.score)
         best_first = sorted(scores, key=lambda pid: (-scores[pid], pid))
-        return [
-            RetrievalHit(pid, scores[pid], MappingProxyType(provenance[pid])) for pid in best_first[:limit]
-        ]
+        return [RetrievalHit(pid, scores[pid], MappingProxyType(provenance[pid])) for pid in best_first[:limit]]

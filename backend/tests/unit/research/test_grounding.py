@@ -36,9 +36,7 @@ def cite(quote: str, passage_id: str = "AMD-10K-2022#0042") -> Citation:
 
 def test_a_fully_cited_answer_is_grounded() -> None:
     answer = policy.assess(
-        draft(
-            AnswerSegment("AMD relies on third-party manufacturers.", (cite("Supply may be constrained."),))
-        ),
+        draft(AnswerSegment("AMD relies on third-party manufacturers.", (cite("Supply may be constrained."),))),
         EVIDENCE,
     )
 
