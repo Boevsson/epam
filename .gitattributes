@@ -1,0 +1,2 @@
+# Never treat filings as text: no line-ending conversion, no text diffs.
+*.pdf binary
