@@ -56,3 +56,36 @@ def _first_occurrences(hits: Iterable[RetrievalHit]) -> Iterator[RetrievalHit]:
         if hit.passage_id not in seen:
             seen.add(hit.passage_id)
             yield hit
+
+
+class WeightedScoreFusion:
+    """Convex combination of min-max normalized scores: ``alpha * dense + (1 - alpha) * keyword``.
+
+    Bruch, Gai & Ingber (ACM TOIS 2023) found that a tuned convex combination can beat RRF with only a few
+    labeled queries; the evaluation harness compares both. A passage missing from one ranking scores 0 there.
+    """
+
+    def __init__(self, alpha: float = 0.5, *, dense: str = "dense", keyword: str = "bm25") -> None:
+        if not 0 <= alpha <= 1:
+            raise ValueError(f"alpha must be within [0, 1], got {alpha}")
+        self._weights = {dense: alpha, keyword: 1 - alpha}
+
+    def fuse(self, rankings: Mapping[str, Sequence[RetrievalHit]], limit: int) -> list[RetrievalHit]:
+        if limit < 1:
+            raise ValueError(f"limit must be >= 1, got {limit}")
+        scores: dict[PassageId, float] = {}
+        provenance: dict[PassageId, dict[str, SourceRank]] = {}
+        for source in sorted(rankings):
+            hits = list(_first_occurrences(rankings[source]))
+            if not hits:
+                continue
+            low, high = min(h.score for h in hits), max(h.score for h in hits)
+            weight = self._weights.get(source, 0.0)
+            for rank, hit in enumerate(hits, start=1):
+                normalized = (hit.score - low) / (high - low) if high > low else 1.0
+                scores[hit.passage_id] = scores.get(hit.passage_id, 0.0) + weight * normalized
+                provenance.setdefault(hit.passage_id, {})[source] = SourceRank(rank, hit.score)
+        best_first = sorted(scores, key=lambda pid: (-scores[pid], pid))
+        return [
+            RetrievalHit(pid, scores[pid], MappingProxyType(provenance[pid])) for pid in best_first[:limit]
+        ]

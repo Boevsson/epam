@@ -29,7 +29,7 @@ def test_alpha_zero_follows_the_keyword_ranking() -> None:
 def test_scores_are_min_max_normalized_per_retriever_before_mixing() -> None:
     fused = WeightedScoreFusion(alpha=0.5).fuse({"bm25": BM25, "dense": DENSE}, limit=4)
 
-    scores = {hit.passage_id: hit.score for hit in fused}
+    scores: dict[str, float] = {hit.passage_id: hit.score for hit in fused}
     assert scores["B"] == pytest.approx(
         0.5 * (6.0 - 0.5) / (12.0 - 0.5) + 0.5 * (0.80 - 0.79) / (0.91 - 0.79)
     )
