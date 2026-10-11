@@ -36,7 +36,7 @@ class GroundingPolicy:
             status = GroundingStatus.PARTIALLY_GROUNDED
         else:
             status = GroundingStatus.GROUNDED
-        return Answer(status, segments, coverage, evidence, draft.generator, draft.model)
+        return Answer(status, segments, coverage, evidence, draft.generator, draft.model, draft.notice)
 
 
 def _supported(citation: Citation, evidence: Evidence) -> bool:

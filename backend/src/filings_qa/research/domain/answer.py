@@ -31,6 +31,7 @@ class DraftAnswer:
     segments: tuple[AnswerSegment, ...]
     generator: str
     model: str | None = None
+    notice: str | None = None  # e.g. why the LLM was not used
 
 
 class GroundingStatus(StrEnum):
@@ -66,6 +67,7 @@ class Answer:
     evidence: Evidence
     generator: str
     model: str | None = None
+    notice: str | None = None
 
     def __post_init__(self) -> None:
         for segment in self.segments:

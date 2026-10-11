@@ -11,6 +11,8 @@ from filings_qa.research.domain.retrieval import RetrievalHit, SourceRank
 from filings_qa.research.domain.scope import SearchScope
 from filings_qa.shared_kernel.values import FilingId, FiscalYear, ItemCode, PageRange, PassageId, Ticker
 
+COMPANY_NAMES = {"AMD": "Advanced Micro Devices, Inc.", "PFE": "Pfizer Inc.", "PEP": "PepsiCo, Inc."}
+
 
 def make_passage(
     passage_id: str,
@@ -23,7 +25,7 @@ def make_passage(
     return Passage(
         id=PassageId(passage_id),
         filing_id=FilingId(passage_id.split("#")[0]),
-        company=f"{ticker} Inc.",
+        company=COMPANY_NAMES.get(ticker, f"{ticker} Inc."),
         ticker=Ticker(ticker),
         fiscal_year=FiscalYear(year),
         item=item,
@@ -52,9 +54,16 @@ def _summaries(passages: Sequence[Passage]) -> list[FilingSummary]:
     for passage in passages:
         by_filing.setdefault(passage.filing_id, []).append(passage)
     return [
-        FilingSummary(fid, ps[0].company, ps[0].ticker, ps[0].fiscal_year, (ps[0].company,), 100, len(ps))
+        FilingSummary(
+            fid, ps[0].company, ps[0].ticker, ps[0].fiscal_year, _aliases(ps[0].company), 100, len(ps)
+        )
         for fid, ps in by_filing.items()
     ]
+
+
+def _aliases(company: str) -> tuple[str, ...]:
+    """The company name and its first word ("Pfizer Inc." -> "Pfizer"), like corpus.yaml aliases."""
+    return (company, company.split()[0].rstrip(","))
 
 
 class StubRetriever:
