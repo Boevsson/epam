@@ -1,7 +1,7 @@
 import pytest
 
 from filings_qa.shared_kernel.errors import InvalidValueError
-from filings_qa.shared_kernel.values import FiscalYear, ItemCode, PageRange, Ticker
+from filings_qa.shared_kernel.values import FiscalYear, FormType, ItemCode, PageRange, Ticker
 
 
 class TestPageRange:
@@ -93,3 +93,12 @@ class TestItemCode:
     def test_headings_use_the_official_titles(self) -> None:
         assert ItemCode.RISK_FACTORS.heading == "Risk Factors"
         assert ItemCode.MARKET_RISK.heading == "Quantitative and Qualitative Disclosures About Market Risk"
+
+
+class TestFormType:
+    def test_compact_form_is_used_in_identifiers(self) -> None:
+        assert FormType.TEN_K.compact == "10K"
+        assert FormType.TEN_K_AMENDMENT.compact == "10KA"
+
+    def test_parses_the_label_used_in_manifests(self) -> None:
+        assert FormType("10-K") is FormType.TEN_K
