@@ -20,9 +20,10 @@ from filings_qa.research.application.ask_question import AskQuestion
 from filings_qa.research.application.fallback_generator import FallbackAnswerGenerator
 from filings_qa.research.application.hybrid_retriever import HybridRetriever
 from filings_qa.research.application.list_filings import ListFilings
+from filings_qa.research.application.ports import Retriever
 from filings_qa.research.application.search_passages import SearchPassages
 from filings_qa.research.application.services import ResearchServices
-from filings_qa.research.domain.fusion import ReciprocalRankFusion
+from filings_qa.research.domain.fusion import ReciprocalRankFusion, WeightedScoreFusion
 from filings_qa.research.domain.grounding import GroundingPolicy
 
 HEADER_TOKEN_ALLOWANCE = 64  # room for the contextual header prepended to every passage
@@ -80,3 +81,28 @@ def build_research_services(
         snapshot_version=reader.manifest.version,
         answer_generator="claude" if claude else "extractive",
     )
+
+
+def build_evaluation(
+    settings: Settings, embedder: SentenceTransformerEmbedder | None = None
+) -> tuple[SqliteSnapshotReader, dict[str, tuple[Retriever, bool]]]:
+    """Retriever configurations to compare: each single retriever, both fusion strategies, and the value of
+    scope detection. Returns the reader and {name: (retriever, use_scope_detection)}."""
+    embedder = embedder or build_embedder(settings)
+    reader = SqliteSnapshotReader.open_current(settings.index_dir, expected_embedding_model=settings.embedding_model)
+    keyword, semantic = Bm25Retriever(reader), DenseRetriever(reader, embedder)
+    candidates = settings.retrieval_candidates
+
+    def hybrid(fusion: ReciprocalRankFusion | WeightedScoreFusion) -> HybridRetriever:
+        return HybridRetriever([keyword, semantic], fusion, candidates=candidates)
+
+    rrf = hybrid(ReciprocalRankFusion(k=settings.rrf_k))
+    return reader, {
+        "BM25 only": (keyword, True),
+        "Dense only": (semantic, True),
+        f"Hybrid, RRF (k={settings.rrf_k})": (rrf, True),
+        "Hybrid, convex (alpha=0.3)": (hybrid(WeightedScoreFusion(alpha=0.3)), True),
+        "Hybrid, convex (alpha=0.5)": (hybrid(WeightedScoreFusion(alpha=0.5)), True),
+        "Hybrid, convex (alpha=0.7)": (hybrid(WeightedScoreFusion(alpha=0.7)), True),
+        "Hybrid, RRF, without scope detection": (rrf, False),
+    }
