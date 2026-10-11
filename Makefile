@@ -29,7 +29,7 @@ ask: ## Ask from the terminal: make ask Q="What drove AMD's revenue change in FY
 frontend-check: ## Frontend tests, type-check and production build
 	cd frontend && npm test && npm run build
 
-up: ## Build and start ingest -> api -> web (http://localhost:$${WEB_PORT:-8080})
+up: ## Build and start ingest -> api -> web (UI on http://localhost:8080 by default)
 	docker compose up --build -d
 
 down: ## Stop the stack

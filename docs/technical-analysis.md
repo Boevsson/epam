@@ -6,6 +6,23 @@
 
 ---
 
+## Implementation status (2026-10-12)
+
+The plan below was implemented. Where it deviated, the reason was measured or hit in practice; each deviation is
+recorded in an ADR:
+
+| Plan | Built | Why |
+|---|---|---|
+| FAISS `IndexFlatIP` | Exact NumPy cosine search | faiss-cpu and torch bundle separate OpenMP runtimes that crash on macOS; same results in < 1 ms at this scale ([ADR 0004](adr/0004-exact-numpy-vector-search-instead-of-faiss.md)) |
+| Optional cross-encoder reranker | Rejected | Lowered Hit@10 (0.67 → 0.58) and added 0.5–3 s ([ADR 0006](adr/0006-analyst-vocabulary-query-expansion.md)) |
+| (not planned) | Analyst-vocabulary query expansion | +9 points Hit@10, +12 points MRR (in-sample caveat) ([ADR 0006](adr/0006-analyst-vocabulary-query-expansion.md)) |
+| TOC = page with ≥ 4 headings | Page whose headings are followed by page numbers | Short items share body pages; see §5.4 for the rules learned from the real filings |
+| PDFs from the email | 7 FinanceBench 10-Ks + 33 golden questions | No PDFs were provided ([ADR 0005](adr/0005-financebench-corpus-and-evaluation.md)) |
+| `docs/evaluation.md` | [`docs/evaluation-results.md`](evaluation-results.md) via `make eval` | Generated, measured numbers only |
+
+Final retrieval quality: hybrid RRF reaches Hit@10 0.67 and MRR@10 0.32, against BM25 alone at 0.58 / 0.27 and dense
+alone at 0.55 / 0.23. See the [README](../README.md#evaluation).
+
 ## 0. Key decisions at a glance
 
 | # | Decision | Why it matters for this brief |
