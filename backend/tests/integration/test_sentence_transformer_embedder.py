@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+
 from filings_qa.infrastructure.embeddings import SentenceTransformerEmbedder
 
 pytestmark = pytest.mark.slow

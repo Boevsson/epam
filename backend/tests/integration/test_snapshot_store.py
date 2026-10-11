@@ -6,9 +6,9 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+
 from filings_qa.infrastructure.snapshot import SnapshotDirectory
 from filings_qa.ingestion.adapters.snapshot_store import FileSnapshotStore
-
 from filings_qa.ingestion.domain.chunking import Chunk
 from filings_qa.ingestion.domain.filing import Filing, FilingMetadata
 from filings_qa.shared_kernel.values import FiscalYear, FormType, ItemCode, PageRange, Ticker
@@ -48,7 +48,8 @@ def test_publish_writes_passages_keyword_index_vectors_and_manifest(
     version = store.publish(filings, fingerprint="abc")
 
     snapshot = SnapshotDirectory(tmp_path / "index").current_path()
-    assert snapshot is not None and snapshot.name == version
+    assert snapshot is not None
+    assert snapshot.name == version
     manifest = json.loads((snapshot / "manifest.json").read_text())
     assert manifest["fingerprint"] == "abc"
     assert manifest["passage_count"] == 3
@@ -81,7 +82,7 @@ def test_a_new_publish_becomes_current_and_keeps_the_previous_snapshot(
 
 
 class ExplodingEmbedder(HashingEmbedder):
-    def embed_documents(self, texts: object) -> np.typing.NDArray[np.float32]:  # type: ignore[override]
+    def embed_documents(self, texts: object) -> np.typing.NDArray[np.float32]:
         raise RuntimeError("model crashed")
 
 

@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import pymupdf
-from filings_qa.ingestion.adapters.pymupdf_parser import PyMuPdfParser
 
+from filings_qa.ingestion.adapters.pymupdf_parser import PyMuPdfParser
 from filings_qa.ingestion.application.ports import FilingSource
 from filings_qa.ingestion.domain.filing import FilingMetadata
 from filings_qa.shared_kernel.values import FiscalYear, FormType, Ticker

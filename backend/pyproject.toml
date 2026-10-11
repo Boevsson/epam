@@ -66,12 +66,16 @@ src = ["src", "tests"]
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "UP", "SIM", "C4", "N", "PT", "RUF"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["filings_qa", "tests"]
+
 [tool.mypy]
 strict = true
 warn_unreachable = true
 mypy_path = "src"
 explicit_package_bases = true
 files = ["src", "tests"]
+untyped_calls_exclude = ["pymupdf"]  # PyMuPDF ships partial annotations
 
 [[tool.mypy.overrides]]
 module = ["Stemmer", "bm25s", "bm25s.*"]

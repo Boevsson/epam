@@ -2,8 +2,8 @@ import hashlib
 from pathlib import Path
 
 import pytest
-from filings_qa.ingestion.adapters.corpus_manifest import CorpusManifestError, YamlCorpusCatalog
 
+from filings_qa.ingestion.adapters.corpus_manifest import CorpusManifestError, YamlCorpusCatalog
 from filings_qa.shared_kernel.values import FiscalYear, FormType, Ticker
 
 MANIFEST = """
@@ -40,7 +40,7 @@ def test_reads_metadata_location_and_hash_of_each_filing(tmp_path: Path) -> None
 def test_a_listed_pdf_that_does_not_exist_is_an_error(tmp_path: Path) -> None:
     manifest = write(tmp_path / "corpus.yaml", MANIFEST)
 
-    with pytest.raises(CorpusManifestError, match="PFIZER_2021_10K.pdf"):
+    with pytest.raises(CorpusManifestError, match=r"PFIZER_2021_10K\.pdf"):
         YamlCorpusCatalog(manifest, filings_dir=tmp_path).sources()
 
 
