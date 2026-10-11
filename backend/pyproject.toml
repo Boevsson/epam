@@ -44,12 +44,14 @@ build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = ["-ra", "--strict-markers", "--strict-config"]
+# Slow (model download), eval (real corpus) and live (paid API) tests are opt-in: pytest -m slow, -m eval, -m live
+addopts = ["-ra", "--strict-markers", "--strict-config", "-m", "not slow and not eval and not live"]
 xfail_strict = true
 markers = [
     "slow: needs ML models or large files",
     "e2e: exercises the HTTP API end to end",
     "eval: measures retrieval and answer quality on the real corpus",
+    "live: calls a paid external API (needs ANTHROPIC_API_KEY)",
 ]
 
 [tool.coverage.run]
